@@ -9,7 +9,7 @@ from bson import ObjectId
 from datetime import datetime
 from pymongo import MongoClient
 from django.contrib.auth.decorators import login_required
-
+#testin
 # from .serializers import HeroSerializer
 # from .models import Hero
 from django.views.decorators.csrf import csrf_exempt
@@ -189,14 +189,14 @@ def WeatherStation(request):
         body = json.loads(request.body.decode("utf-8"))
         print(body)
         newstation = {
-            "Device_ID": body["deviceid"],
-            "Device_Name": body["devicename"],
-            "Latitude": body["latitude"],
-            "Longitude": body["longitude"],
-            "Location": body["location"],
-            "State": body["state"],
-            "Last_Reading": body["lastreading"],
-            "New_Station": body["newstation"],
+            "Latitude": body["Lat"],
+            "Longitude": body["Long"],
+            "State": body["State"],
+            "IsNewStation": body["IsNew"],
+            "LastReading": body["LastRead"],
+            "StationCode": body["Code"],
+            "StationName": body["Name"],
+            
         }
         x = collection1.insert_one(newstation)
         newstation["_id"] = str(x.inserted_id)  # Convert ObjectId to string

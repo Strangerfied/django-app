@@ -31,8 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'myapi',
+    #'myapi',
     #'myapi.apps.MyapiConfig',
+    'weather',
+    'users',
+    'stations',
+    'analytics',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
