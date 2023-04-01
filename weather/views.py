@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 #testin
 
 client = pymongo.MongoClient(
-    "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://admin2:poolcool1@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority"
 )
 
 dbname = client["eduClimateAnalysis"]
@@ -34,6 +34,14 @@ collection = dbname["climateData"]
        # print("nJson Data:", json_data)
        # return JsonResponse(json_data, safe=False)"""
 
+def ConnectionTest(request):
+    try:
+        collection.find_one()
+        result = {"status": "success", "message": "MongoDB connection successful!"}
+    except Exception as e:
+        result = {"status": "error", "message": f"Failed to connect to MongoDB: {e}"}
+    return JsonResponse(result)
+    
 @csrf_exempt
 def Weather(request):
     if request.method == "PATCH":

@@ -5,7 +5,7 @@ from weather.views import Weather
 from django.urls import register_converter
 from datetime import datetime
 from django.contrib.auth import views as auth_views
-
+from weather.views import ConnectionTest
 #tei
 
 class DateTimeConverter:
@@ -27,7 +27,7 @@ urlpatterns = [
     path("weather/", Weather),
     #path("weather/batch/", GetTemperatures, name="batch"),
     #path("weather/index/", IndexQuery),
-
+    path('connectiontest/', ConnectionTest, name='ConnectionTest'),
     ]
 
 
