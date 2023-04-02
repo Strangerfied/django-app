@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 #testin
 
 client = pymongo.MongoClient(
-    "mongodb+srv://admin2:poolcool1@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority"
 )
 
 dbname = client["eduClimateAnalysis"]
@@ -47,10 +47,13 @@ def Weather(request):
     if request.method == "PATCH":
         try:
             data = json.loads(request.body)
+            print(data)
             document_ids = data.get("_id", [])
+            print(document_ids)
             result = []
             for document_id in document_ids:
                 obj_id = ObjectId(document_id)
+                print(obj_id)
 
                 temp = collection.find_one(
                     {"_id": obj_id, "Temperature (°C)": {"$exists": True}}
@@ -76,11 +79,10 @@ def Weather(request):
                         }
                     )
             return JsonResponse(result, safe=False)
-        except:
+        except Exception as exception:
             return JsonResponse(
-                {"status": "error", "message": "Invalid payload format or document ID."}
+                {"status": "error", "message": f"An exception occurred: {str(exception)}"}
             )
-
     if request.method == "PUT":
         body = json.loads(request.body.decode("utf-8"))
         station_name = body.get("Device Name", "")
@@ -116,20 +118,20 @@ def Weather(request):
                     "message": "No data found for the specified station and date/time.",
                 }
             )
-
     if request.method == "GET":
         try:
-            limit = int(request.GET.get("limit", 10))
-            skip = int(request.GET.get("skip", 0))
-
             temps = []
-            for temp in collection.find().batch_size(5).limit(limit).skip(skip):
+            num_docs_per_batch = 5
+            for temp in collection.find().batch_size(num_docs_per_batch).limit(50):
                 temps.append(
                     {
                         "_id": str(temp["_id"]),
                         "Temperature (°C)": temp["Temperature (°C)"],
                     }
                 )
+                if len(temps) == num_docs_per_batch:
+                    print(f"Processed {num_docs_per_batch} documents in this batch")
+                    num_docs_per_batch += 5
 
             return JsonResponse({"status": "success", "temperatures": temps})
         except:
@@ -139,24 +141,19 @@ def Weather(request):
                     "message": "An error occurred while retrieving temperature records.",
                 }
             )
-
+    
     if request.method == "POST":
-        # Get the index value from the JSON body of the request
         body = json.loads(request.body)
         index_value = body.get('index_value')
 
         index_info = collection.index_information()
         if index_value not in index_info:
-            # Create an index on the specified field if it doesn't already exist
             collection.create_index(index_value)
 
-        # Perform the query using the created index
         result = collection.find().hint(index_value).limit(10)
-        # Serialize the result to JSON and return as a response
         json_data = json_util.dumps(result)
         return JsonResponse(json.loads(json_data), safe=False)
 
-    # Return a 405 Method Not Allowed error if the request method is not POST
     return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
 """

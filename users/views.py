@@ -69,7 +69,7 @@ def Users(request):
 
         return JsonResponse(response_data, status=201)
     
-    elif request.method == "DELETE":
+    if request.method == "DELETE":
         try:
             data = json.loads(request.body)
             user_ids = data.get("_id", [])

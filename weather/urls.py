@@ -21,13 +21,8 @@ class DateTimeConverter:
 register_converter(DateTimeConverter, "datetime")
 
 urlpatterns = [
-    #path("", views.index, name="index"),
-    # path('', include(router.urls)),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
     path("weather/", Weather),
-    #path("weather/batch/", GetTemperatures, name="batch"),
-    #path("weather/index/", IndexQuery),
-    path('connectiontest/', ConnectionTest, name='ConnectionTest'),
+    #path('connectiontest/', ConnectionTest, name='ConnectionTest'),
     ]
 
 
