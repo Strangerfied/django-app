@@ -50,10 +50,13 @@ def Users(request):
         last_login = datetime.datetime.fromisoformat(last_login_str)
         password = body["Password"].encode("utf-8")
         hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+        accessLevel = body["Access Level"]
+        if accessLevel not in ['administrator', 'manager']:
+            accessLevel = 'user'
         newuser = {
             "User Name": body["User Name"],
             "Password": hashed_password.decode("utf-8"),
-            "Access Level": body["Access Level"],
+            "Access Level": accessLevel,
             "First Name": body["First Name"],
             "Surname": body["Surname"],
             "Email": body["Email"],
