@@ -34,7 +34,7 @@ collection1 = dbname["stations"]
 collection2 = dbname["users"]
 
 @csrf_exempt
-def WeatherStation(request):
+def Stations(request):
     """
     # Check if user is authenticated as manager or admin
     if not request.user.is_authenticated or not (
@@ -56,7 +56,6 @@ def WeatherStation(request):
             "Longitude": body["Long"],
             "State": body["State"],
             "IsNewStation": body["IsNew"],
-            "LastReading": body["LastRead"],
             "StationCode": body["Code"],
             "StationName": body["Name"],
         }

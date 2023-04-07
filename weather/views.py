@@ -8,12 +8,13 @@ from datetime import datetime
 from pymongo import MongoClient
 import pymongo
 from django.views.decorators.csrf import csrf_exempt
+import ssl
 #Create your views here.
 
 #testin
 
 client = pymongo.MongoClient(
-    "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority"
+    "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority&tls=true"
 )
 
 dbname = client["eduClimateAnalysis"]

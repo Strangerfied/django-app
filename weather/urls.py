@@ -21,7 +21,7 @@ class DateTimeConverter:
 register_converter(DateTimeConverter, "datetime")
 
 urlpatterns = [
-    path("weather/", Weather),
+    path("api/weather/", Weather),
     #path('connectiontest/', ConnectionTest, name='ConnectionTest'),
     ]
 

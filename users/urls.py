@@ -16,5 +16,5 @@ class DateTimeConverter:
 
 
 urlpatterns = [
-        path("users/", Users),
+        path("api/users/", Users),
         ]

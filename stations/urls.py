@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path("stations/", WeatherStation),
+    path("api/stations/", Stations),
     ]
