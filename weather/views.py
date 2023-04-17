@@ -57,14 +57,14 @@ def ConnectionTest(request):
 
 @csrf_exempt
 def Weather(request):
-    client = pymongo.MongoClient(request.session['mongo_client_uri'])
+    client = pymongo.MongoClient(request.session['mongoclient'])
 
 
     dbname = client["eduClimateAnalysis"]
 
     collection = dbname["climateData"]
 
-    if 'mongo_client_uri' in request.session and request.session['mongo_client_uri'] is not None:
+    if 'mongoclient' in request.session and request.session['mongoclient'] is not None:
         if request.method == "PATCH":
             try:
                 data = json.loads(request.body)

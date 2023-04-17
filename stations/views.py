@@ -48,8 +48,8 @@ def ConnectionTest(request):
 @csrf_exempt
 def Stations(request):
     print("are we hitting this")
-    print(request.session['mongo_client_uri'])
-    client = pymongo.MongoClient(request.session['mongo_client_uri'])
+    print(request.session['mongoclient'])
+    client = pymongo.MongoClient(request.session['mongoclient'])
 
 
     dbname = client["eduClimateAnalysis"]
@@ -61,7 +61,7 @@ def Stations(request):
     collection2 = dbname["users"]
     
 
-    if 'mongo_client_uri' in request.session and request.session['mongo_client_uri'] is not None:
+    if 'mongoclient' in request.session and request.session['mongoclient'] is not None:
         if request.method == "PUT":
 
             data = json.loads(request.body)

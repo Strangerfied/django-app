@@ -40,9 +40,9 @@ import pymongo
 @csrf_exempt
 def Users(request):
     print("users are getting hit")
-    print(request.session['mongo_client_uri'])
+    print(request.session['mongoclient'])
 
-    client = pymongo.MongoClient(request.session['mongo_client_uri'])
+    client = pymongo.MongoClient(request.session['mongoclient'])
 
 
     dbname = client["eduClimateAnalysis"]
@@ -53,7 +53,7 @@ def Users(request):
 
     collection2 = dbname["users"]
 
-    if 'mongo_client_uri' in request.session and request.session['mongo_client_uri'] is not None:
+    if 'mongoclient' in request.session and request.session['mongoclient'] is not None:
 
         if request.method == "GET":
             cursor = collection2.find()
