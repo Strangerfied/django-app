@@ -70,11 +70,11 @@ def Stations(request):
 
             if not station_id:
                 return JsonResponse(
-                    {"error": "Weather station ID is required."}, status=400
+                    {"error": "Weather station ID is required"}, status=400
                 )
             station = collection1.find_one({"_id": ObjectId(station_id)})
             if not station:
-                return JsonResponse({"error": "Weather station not found."}, status=404)
+                return JsonResponse({"error": "Weather station not found"}, status=404)
 
             longitude = data.get("Longitude")
             latitude = data.get("Latitude")
@@ -84,7 +84,7 @@ def Stations(request):
                     {"$set": {"Longitude": longitude, "Latitude": latitude}},
                 )
             return JsonResponse(
-                {"message": f"Weather station {station_id} updated successfully."},
+                {"message": f"Weather station {station_id} updated successfully"},
                 status=200,
             )
         #else:
@@ -171,7 +171,7 @@ def Stations(request):
                 )
             station = collection1.find_one({"_id": ObjectId(station_id)})
             if not station:
-                return JsonResponse({"error": "Weather station not found."}, status=404)
+                return JsonResponse({"error": "Weather station not found"}, status=404)
 
             longitude = data.get("Longitude")
             latitude = data.get("Latitude")
@@ -181,7 +181,7 @@ def Stations(request):
                     {"$set": {"Longitude": longitude, "Latitude": latitude}},
                 )
             return JsonResponse(
-                {"message": f"Weather station {station_id} updated successfully."},
+                {"message": f"Weather station {station_id} updated successfully"},
                 status=200,
             )
         else:
@@ -189,6 +189,6 @@ def Stations(request):
 
     else:
         return JsonResponse(
-            {"status": "error", "message": "Please login to access this resource."}
+            {"status": "error", "message": "Please login to access this"}
         )
 

@@ -30,7 +30,7 @@ def login(request):
         else:
             return JsonResponse({'success': False, 'error': 'Invalid username or password'})
     else:
-        return JsonResponse({'success': False, 'error': 'Invalid request method LOGIN'})
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 #tes againt final
 def logout(request):

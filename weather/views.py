@@ -115,7 +115,7 @@ def Weather(request):
                 return JsonResponse(
                     {
                         "status": "error",
-                        "message": "Invalid query parameter. Time is required.",
+                        "message": "Invalid format",
                     }
                 )
 
@@ -136,7 +136,7 @@ def Weather(request):
                 return JsonResponse(
                     {
                         "status": "error",
-                        "message": "No data found for the specified station and date/time.",
+                        "message": "No data found for the specified station and date/time",
                     }
                 )
         if request.method == "GET":
@@ -159,7 +159,7 @@ def Weather(request):
                 return JsonResponse(
                     {
                         "status": "error",
-                        "message": "An error occurred while retrieving temperature records.",
+                        "message": "An error occurred while retrieving temperature records",
                     }
                 )
 
@@ -179,7 +179,7 @@ def Weather(request):
 
     else:
         return JsonResponse(
-            {"status": "error", "message": "Please login to access this resource."}
+            {"status": "error", "message": "Please login to access this"}
         )
 """
 def GetTemperatures(request):

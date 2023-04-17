@@ -114,7 +114,7 @@ def Users(request):
                 else:
                     return JsonResponse({"message": "No user(s) were found."})
             except:
-                return JsonResponse({"message": "Invalid payload format or _id."})
+                return JsonResponse({"message": "Invalid format or _id."})
         if request.method == "PATCH":
             try:
                 data = json.loads(request.body)
@@ -133,9 +133,9 @@ def Users(request):
                 else:
                     return JsonResponse({"message": f"No users were found"})
             except:
-                return JsonResponse({"message": "Invalid payload format."})
+                return JsonResponse({"message": "Invalid format."})
     else:
         return JsonResponse(
-            {"status": "error", "message": "Please login to access this resource."}
+            {"status": "error", "message": "Please login to access this}
         )
 
