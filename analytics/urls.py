@@ -3,5 +3,5 @@ from analytics.views import MaxRain
 from . import views
 
 urlpatterns = [
-    path("api/analytics/", MaxRain),
+    path("api/maxPrecipitation/", MaxRain),
     ]

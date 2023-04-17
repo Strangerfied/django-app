@@ -22,7 +22,7 @@ register_converter(DateTimeConverter, "datetime")
 
 urlpatterns = [
     path("api/weather/", Weather),
-    #path('connectiontest/', ConnectionTest, name='ConnectionTest'),
+    path('connectiontest/', ConnectionTest, name='ConnectionTest'),
     ]
 
 

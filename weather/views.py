@@ -9,17 +9,22 @@ from pymongo import MongoClient
 import pymongo
 from django.views.decorators.csrf import csrf_exempt
 import ssl
+from django.contrib.auth.decorators import login_required
+from django.http import request
 #Create your views here.
 
 #testin
 
-client = pymongo.MongoClient(
-    "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority&tls=true"
-)
+#client = pymongo.MongoClient(
+ #  "mongodb+srv://admin2:poolcool@cluster1.syijvpg.mongodb.net/?retryWrites=true&w=majority&tls=true"
+#)
 
-dbname = client["eduClimateAnalysis"]
+#client = pymongo.MongoClient(request.session['mongo_client_uri'])
 
-collection = dbname["climateData"]
+
+#dbname = client["eduClimateAnalysis"]
+
+#collection = dbname["climateData"]
 #test aain
 #@csrf_exempt
     #if request.method == "GET":
@@ -36,127 +41,146 @@ collection = dbname["climateData"]
        # return JsonResponse(json_data, safe=False)"""
 
 def ConnectionTest(request):
+    client = pymongo.MongoClient(request.session['mongo_client_uri'])
+
+
+    dbname = client["eduClimateAnalysis"]
+
+    collection = dbname["climateData"]
+
     try:
         collection.find_one()
         result = {"status": "success", "message": "MongoDB connection successful!"}
     except Exception as e:
         result = {"status": "error", "message": f"Failed to connect to MongoDB: {e}"}
     return JsonResponse(result)
-    
+
 @csrf_exempt
 def Weather(request):
-    if request.method == "PATCH":
-        try:
-            data = json.loads(request.body)
-            print(data)
-            document_ids = data.get("_id", [])
-            print(document_ids)
-            result = []
-            for document_id in document_ids:
-                obj_id = ObjectId(document_id)
-                print(obj_id)
+    client = pymongo.MongoClient(request.session['mongo_client_uri'])
 
-                temp = collection.find_one(
-                    {"_id": obj_id, "Temperature (°C)": {"$exists": True}}
+
+    dbname = client["eduClimateAnalysis"]
+
+    collection = dbname["climateData"]
+
+    if 'mongo_client_uri' in request.session and request.session['mongo_client_uri'] is not None:
+        if request.method == "PATCH":
+            try:
+                data = json.loads(request.body)
+                print(data)
+                document_ids = data.get("_id", [])
+                print(document_ids)
+                result = []
+                for document_id in document_ids:
+                    obj_id = ObjectId(document_id)
+                    print(obj_id)
+
+                    temp = collection.find_one(
+                        {"_id": obj_id, "Temperature (°C)": {"$exists": True}}
+                    )
+
+                    if temp:
+                        celsius_temp = temp["Temperature (°C)"]
+                        fahrenheit_temps = celsius_temp * 1.8 + 32
+                        collection.update_one(
+                            {"_id": obj_id}, {"$set": {"Fahrenheit": fahrenheit_temps}}
+                        )
+                        result.append(
+                            {
+                                "status": "success",
+                                "message": f"Temperature record with ID {document_id} updated with Fahrenheit values.",
+                            }
+                        )
+                    else:
+                        result.append(
+                            {
+                                "status": "error",
+                                "message": f"Temperature record with ID {document_id} not found or missing 'Temperature (°C)' field.",
+                            }
+                        )
+                return JsonResponse(result, safe=False)
+            except Exception as exception:
+                return JsonResponse(
+                    {"status": "error", "message": f"An exception occurred: {str(exception)}"}
                 )
+        if request.method == "PUT":
+            body = json.loads(request.body.decode("utf-8"))
+            station_name = body.get("Device Name", "")
+            date_time_str = body.get("Time", "")
 
-                if temp:
-                    celsius_temp = temp["Temperature (°C)"]
-                    fahrenheit_temps = celsius_temp * 1.8 + 32
-                    collection.update_one(
-                        {"_id": obj_id}, {"$set": {"Fahrenheit": fahrenheit_temps}}
-                    )
-                    result.append(
-                        {
-                            "status": "success",
-                            "message": f"Temperature record with ID {document_id} updated with Fahrenheit values.",
-                        }
-                    )
-                else:
-                    result.append(
-                        {
-                            "status": "error",
-                            "message": f"Temperature record with ID {document_id} not found or missing 'Temperature (°C)' field.",
-                        }
-                    )
-            return JsonResponse(result, safe=False)
-        except Exception as exception:
-            return JsonResponse(
-                {"status": "error", "message": f"An exception occurred: {str(exception)}"}
-            )
-    if request.method == "PUT":
-        body = json.loads(request.body.decode("utf-8"))
-        station_name = body.get("Device Name", "")
-        date_time_str = body.get("Time", "")
-
-        try:
-            date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
-        except ValueError:
-            return JsonResponse(
-                {
-                    "status": "error",
-                    "message": "Invalid query parameter. Time is required.",
-                }
-            )
-
-        result = collection.find_one(
-            {"Device Name": station_name, "Time": date_time_obj},
-            {
-                "Temperature (°C)": 1,
-                "Atmospheric Pressure (kPa)": 1,
-                "Solar Radiation (W/m2)": 1,
-                "Precipitation mm/h": 1,
-                "_id": 0,
-            },
-        )
-
-        if result:
-            return JsonResponse({"status": "success", "data": result})
-        else:
-            return JsonResponse(
-                {
-                    "status": "error",
-                    "message": "No data found for the specified station and date/time.",
-                }
-            )
-    if request.method == "GET":
-        try:
-            temps = []
-            num_docs_per_batch = 5
-            for temp in collection.find().batch_size(num_docs_per_batch).limit(50):
-                temps.append(
+            try:
+                date_time_obj = datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except ValueError:
+                return JsonResponse(
                     {
-                        "_id": str(temp["_id"]),
-                        "Temperature (°C)": temp["Temperature (°C)"],
+                        "status": "error",
+                        "message": "Invalid query parameter. Time is required.",
                     }
                 )
-                if len(temps) == num_docs_per_batch:
-                    print(f"Processed {num_docs_per_batch} documents in this batch")
-                    num_docs_per_batch += 5
 
-            return JsonResponse({"status": "success", "temperatures": temps})
-        except:
-            return JsonResponse(
+            result = collection.find_one(
+                {"Device Name": station_name, "Time": date_time_obj},
                 {
-                    "status": "error",
-                    "message": "An error occurred while retrieving temperature records.",
-                }
+                    "Temperature (°C)": 1,
+                    "Atmospheric Pressure (kPa)": 1,
+                    "Solar Radiation (W/m2)": 1,
+                    "Precipitation mm/h": 1,
+                    "_id": 0,
+                },
             )
-    
-    if request.method == "POST":
-        body = json.loads(request.body)
-        index_value = body.get('index_value')
 
-        index_info = collection.index_information()
-        if index_value not in index_info:
-            collection.create_index(index_value)
+            if result:
+                return JsonResponse({"status": "success", "data": result})
+            else:
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": "No data found for the specified station and date/time.",
+                    }
+                )
+        if request.method == "GET":
+            try:
+                temps = []
+                num_docs_per_batch = 5
+                for temp in collection.find().batch_size(num_docs_per_batch).limit(50):
+                    temps.append(
+                        {
+                            "_id": str(temp["_id"]),
+                            "Temperature (°C)": temp["Temperature (°C)"],
+                        }
+                    )
+                    if len(temps) == num_docs_per_batch:
+                        print(f"Processed {num_docs_per_batch} documents in this batch")
+                        num_docs_per_batch += 5
 
-        result = collection.find().hint(index_value).limit(10)
-        json_data = json_util.dumps(result)
-        return JsonResponse(json.loads(json_data), safe=False)
+                return JsonResponse({"status": "success", "temperatures": temps})
+            except:
+                return JsonResponse(
+                    {
+                        "status": "error",
+                        "message": "An error occurred while retrieving temperature records.",
+                    }
+                )
 
-    return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+        if request.method == "POST":
+            body = json.loads(request.body)
+            index_value = body.get('index_value')
 
+            index_info = collection.index_information()
+            if index_value not in index_info:
+                collection.create_index(index_value)
+
+            result = collection.find().hint(index_value).limit(10)
+            json_data = json_util.dumps(result)
+            return JsonResponse(json.loads(json_data), safe=False)
+
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+    else:
+        return JsonResponse(
+            {"status": "error", "message": "Please login to access this resource."}
+        )
 """
 def GetTemperatures(request):
     if request.method == "GET":

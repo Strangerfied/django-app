@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'users',
     'stations',
     'analytics',
+    'auth2',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -106,6 +107,14 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'auth2.backends.MongoDBBackend',
+]
+
+MONGO_URI = 'mongodb+srv://username:password@cluster1.mongodb.net/test?retryWrites=true&w=majority'
+MONGO_DB_NAME = 'eduClimateAnalysis'
 
 
 # Internationalization

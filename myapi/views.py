@@ -212,6 +212,7 @@ def WeatherStation(request):
 @csrf_exempt
 # @user_passes_test(lambda user: user.is_superuser)
 def Users(request):
+    print("no way")
     if request.method == "POST":
         """
         # Check if user is authenticated as manager or admin

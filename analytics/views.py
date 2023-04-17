@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 # from .serializers import HeroSerializer
 # from .models import Hero
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -34,7 +35,7 @@ collection1 = dbname["stations"]
 collection2 = dbname["users"]
 
 # Create your views here.
-
+@csrf_exempt
 def MaxRain(request):
     if request.method == "GET":
         cursor = (
