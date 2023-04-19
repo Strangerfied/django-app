@@ -120,7 +120,7 @@ def Weather(request):
                 )
 
             result = collection.find_one(
-                {"Device Name": station_name, "Time": date_time_obj},
+                {"Time": date_time_obj, "Device Name": station_name},
                 {
                     "Temperature (°C)": 1,
                     "Atmospheric Pressure (kPa)": 1,
@@ -128,6 +128,7 @@ def Weather(request):
                     "Precipitation mm/h": 1,
                     "_id": 0,
                 },
+                hint=[("Time", 1)],
             )
 
             if result:
@@ -140,6 +141,20 @@ def Weather(request):
                     }
                 )
         if request.method == "GET":
+            batch_size = int(request.GET.get('batch_size', 10))
+            page_number = int(request.GET.get('page_number', 1))
+
+            skip = (page_number - 1) * batch_size
+
+            documents = collection.find().skip(skip).limit(batch_size)
+
+            document_list = []
+            for doc in documents:
+                doc['_id'] = str(doc['_id'])
+                document_list.append(doc)
+
+            return JsonResponse(document_list, safe=False)
+        if request.method == "GET1":
             try:
                 temps = []
                 num_docs_per_batch = 5

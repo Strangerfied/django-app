@@ -64,28 +64,32 @@ def Users(request):
 
         if request.method == "POST":
             body = json.loads(request.body.decode("utf-8"))
-            last_login_str = body["Last Login"]
-            last_login = datetime.datetime.fromisoformat(last_login_str)
-            password = body["Password"]
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest().upper()
-            accessLevel = body["Access Level"]
-            if accessLevel not in ['administrator', 'manager']:
-                accessLevel = 'user'
-            newuser = {
-                "User Name": body["User Name"],
-                "Password": hashed_password,
-                "Access Level": accessLevel,
-                "First Name": body["First Name"],
-                "Surname": body["Surname"],
-                "Email": body["Email"],
-                "Last Login": last_login,
-            }
-            x = collection2.insert_one(newuser)
-            newuser["_id"] = str(x.inserted_id)  # Convert ObjectId to string
+            users = body.get("users", [])
+            results = []
+            for user in users:
+                last_login_str = user["Last Login"]
+                last_login = datetime.datetime.fromisoformat(last_login_str)
+                password = user["Password"]
+                hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest().upper()
+                accessLevel = user["Access Level"]
+                if accessLevel not in ['administrator', 'manager']:
+                    accessLevel = 'user'
+                newuser = {
+                    "User Name": user["User Name"],
+                    "Password": hashed_password,
+                    "Access Level": accessLevel,
+                    "First Name": user["First Name"],
+                    "Surname": user["Surname"],
+                    "Email": user["Email"],
+                    "Last Login": last_login,
+                }
+                x = collection2.insert_one(newuser)
+                newuser["_id"] = str(x.inserted_id)  # Convert ObjectId to string
+                results.append(newuser)
             response_data = {
                 "status": "success",
-                "message": "New user added successfully",
-                "data": newuser,
+                "message": f"{len(results)} new user(s) added successfully",
+                "data": results,
             }
 
             return JsonResponse(response_data, status=201)
@@ -136,6 +140,6 @@ def Users(request):
                 return JsonResponse({"message": "Invalid format."})
     else:
         return JsonResponse(
-            {"status": "error", "message": "Please login to access this}
+            {"status": "error", "message": "Please login to access this"}
         )
 
